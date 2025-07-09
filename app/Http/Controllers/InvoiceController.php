@@ -143,6 +143,71 @@ class InvoiceController extends Controller
             'user' => auth()->user(),
         ]);
     }
+    public function update(Request $request, Invoice $invoice)
+{
+    if ($invoice->user_id !== auth()->id()) {
+        return redirect()->route('invoices.index')->withErrors('Unauthorized action.');
+    }
+
+    $validated = $request->validate([
+        'from_name' => 'nullable|string|max:255',
+        'to_name' => 'nullable|string|max:255',
+        'invoice_number' => 'required|string|max:255',
+        'date' => 'nullable|date',
+        'due_date' => 'nullable|date',
+        'payment_terms' => 'nullable|string|max:255',
+        'po_number' => 'nullable|string|max:255',
+        'subtotal' => 'required|numeric',
+        'tax_percent' => 'required|numeric|min:0',
+        'discount' => 'required|numeric|min:0',
+        'shipping' => 'required|numeric|min:0',
+        'total' => 'required|numeric',
+        'notes' => 'nullable|string',
+        'terms' => 'nullable|string',
+        'status' => 'required|in:draft,sent,paid',
+    ]);
+
+    // Update invoice fields
+    $invoice->update($validated);
+
+    // Track incoming item IDs
+    $incomingItemIds = collect($request->items)->pluck('id')->filter();
+
+    // Delete removed items
+    $invoice->items()
+        ->whereNotIn('id', $incomingItemIds)
+        ->delete();
+
+    // Update or create items
+    foreach ($request->items as $item) {
+        if (isset($item['id'])) {
+            $invoiceItem = InvoiceItem::find($item['id']);
+            if ($invoiceItem && $invoiceItem->invoice_id === $invoice->id) {
+                $invoiceItem->update($item);
+            }
+        } else {
+            $invoice->items()->create($item);
+        }
+    }
+
+    return redirect()
+        ->route('invoices.index')
+        ->with('success', 'Invoice updated successfully.');
+}
+
+    public function downloadPdf(Invoice $invoice)
+    {
+        if ($invoice->user_id !== auth()->id()) {
+            return redirect()->route('invoices.index')->withErrors('Unauthorized action.');
+        }
+
+        $pdf = \PDF::loadView('invoices.pdf', [
+            'invoice' => $invoice->load('items'),
+        ]);
+
+        return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
+    }
+    
 
 
 }
