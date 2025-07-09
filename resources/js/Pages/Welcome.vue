@@ -1,6 +1,9 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-
+import GuestLayout from '@/Layouts/GuestLayout.vue';
+defineOptions({
+    layout: GuestLayout
+})
 defineProps({
     canLogin: {
         type: Boolean,
