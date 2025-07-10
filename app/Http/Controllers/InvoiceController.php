@@ -6,6 +6,9 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Browsershot\Browsershot;
+
 
 class InvoiceController extends Controller
 {
@@ -193,21 +196,38 @@ class InvoiceController extends Controller
     return redirect()
         ->route('invoices.index')
         ->with('success', 'Invoice updated successfully.');
-}
+    }
+public function download(Invoice $invoice)
+{
+    try {
+        $invoice->load('items');
 
-    public function downloadPdf(Invoice $invoice)
-    {
-        if ($invoice->user_id !== auth()->id()) {
-            return redirect()->route('invoices.index')->withErrors('Unauthorized action.');
-        }
+        $html = view('invoices.print', compact('invoice'))->render();
 
-        $pdf = \PDF::loadView('invoices.pdf', [
-            'invoice' => $invoice->load('items'),
+        // Ensure PHP sees the correct binary paths
+        putenv('PATH=' . getenv('PATH') . ':/usr/local/bin');
+
+        $pdf = \Spatie\Browsershot\Browsershot::html($html)
+            ->setNodeBinary('/usr/local/bin/node')
+            ->setNpmBinary('/usr/local/bin/npm')
+            ->setChromePath('/Applications/Chromium.app/Contents/MacOS/Chromium')
+            ->noSandbox()
+            ->waitUntilNetworkIdle()
+            ->format('A4')
+            ->pdf();
+
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename=invoice.pdf',
         ]);
 
-        return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
+    } catch (\Exception $e) {
+        \Log::error('PDF generation failed', ['message' => $e->getMessage()]);
+        abort(500, 'Could not generate invoice PDF.');
     }
-    
+}
+
+
 
 
 }

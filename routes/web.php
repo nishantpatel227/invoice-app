@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\InvoiceItemController; 
 
 // Welcome Page
 Route::get('/', function () {
@@ -38,9 +39,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
     Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
-    
-
-    // Later: Route::get('/invoices/{invoice}/edit', ...) etc.
 });
+Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])
+    ->name('invoices.download')
+    ->middleware('auth');
+
+
+
 
 require __DIR__.'/auth.php';
