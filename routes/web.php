@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceItemController; 
+use Spatie\Browsershot\Browsershot;
 
 // Welcome Page
 Route::get('/', function () {
@@ -40,9 +41,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/invoices/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
     Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
 });
-Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])
-    ->name('invoices.download')
-    ->middleware('auth');
+Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
 
 
 

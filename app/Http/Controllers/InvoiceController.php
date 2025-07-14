@@ -6,8 +6,10 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Storage;
-use Spatie\Browsershot\Browsershot;
+use Barryvdh\Snappy\Facades\SnappyPdf;
+use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
+
+
 
 
 class InvoiceController extends Controller
@@ -197,37 +199,64 @@ class InvoiceController extends Controller
         ->route('invoices.index')
         ->with('success', 'Invoice updated successfully.');
     }
+// public function download(Invoice $invoice)
+// {
+//     try {
+//         $invoice->load('items');
+
+//       //  $html = view('invoices.print', compact('invoice'))->render();
+
+//         // Ensure PHP sees the correct binary paths
+//                 return Pdf::view('invoices.print', [
+//                 'invoice' => $invoice
+//             ])
+           
+
+//             // This is required for all PDF generation
+//             ->withBrowsershot(function (Browsershot $browsershot) {
+//                 $browsershot
+//                     ->setNodeBinary(config('pdf.node_binary_path'))
+//                     ->setNpmBinary(config('pdf.npm_binary_path'))
+//                     ->setChromePath(config('pdf.chrome_binary_path'))
+//                     ->setCustomTempPath(storage_path(config('pdf.custom_temp_path')))
+//                     ->waitUntilNetworkIdle();
+//             })
+//             ->name(
+//                 "test.pdf"
+//             )
+//             ->download();
+
+//     } catch (\Exception $e) {
+//         \Log::error('PDF generation failed', ['message' => $e->getMessage()]);
+//         abort(500, 'Could not generate invoice PDF.');
+//     }
+// }
+
+// public function download(Invoice $invoice)
+// {
+//     $invoice->load('items'); // Load related items if not eager-loaded
+
+//     $path = storage_path("app/public/invoice_{$invoice->id}.pdf");
+
+//     Pdf::view('invoices.print', [
+//         'invoice' => $invoice,
+//     ])
+//     ->format('A4')
+//     ->save($path);
+
+//     return response()->download($path);
+// }
 public function download(Invoice $invoice)
 {
-    try {
-        $invoice->load('items');
+    $invoice->load('items');
 
-        $html = view('invoices.print', compact('invoice'))->render();
+    return PDF::loadView('invoices.print', [
+        'invoice' => $invoice,
+    ])
+    ->setPaper('a4')
+    ->inline("invoice_{$invoice->id}.pdf");
 
-        // Ensure PHP sees the correct binary paths
-        putenv('PATH=' . getenv('PATH') . ':/usr/local/bin');
-
-        $pdf = \Spatie\Browsershot\Browsershot::html($html)
-            ->setNodeBinary('/usr/local/bin/node')
-            ->setNpmBinary('/usr/local/bin/npm')
-            ->setChromePath('/Applications/Chromium.app/Contents/MacOS/Chromium')
-            ->noSandbox()
-            ->waitUntilNetworkIdle()
-            ->format('A4')
-            ->pdf();
-
-        return response($pdf, 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename=invoice.pdf',
-        ]);
-
-    } catch (\Exception $e) {
-        \Log::error('PDF generation failed', ['message' => $e->getMessage()]);
-        abort(500, 'Could not generate invoice PDF.');
-    }
 }
-
-
 
 
 }

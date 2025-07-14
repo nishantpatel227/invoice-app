@@ -11,16 +11,21 @@ const props = defineProps({
 <template>
   <Head title="View Invoice" />
   <AuthenticatedLayout>
-    <template #header>
-      <h2 class="text-xl font-semibold text-gray-800">Invoice #{{ invoice.invoice_number }}</h2>
+   <template #header>
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800">
+          Invoice #{{ invoice.invoice_number }}
+        </h2>
+
+        <a
+          :href="route('invoices.download', invoice.id)"
+          target="_blank"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Download Invoice
+        </a>
+      </div>
     </template>
-    <a
-  :href="route('invoices.download', invoice.id)"
-  target="_blank"
-  class="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
->
-  Download PDF
-</a>
 
     <div class="py-10 max-w-6xl mx-auto sm:px-6 lg:px-8">
       <div class="bg-white p-6 rounded shadow space-y-6">
