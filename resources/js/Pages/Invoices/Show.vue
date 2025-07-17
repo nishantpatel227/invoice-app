@@ -5,6 +5,7 @@ import { Head } from '@inertiajs/vue3';
 const props = defineProps({
   invoice: Object,
   user: Object,
+
 });
 </script>
 
@@ -31,7 +32,7 @@ const props = defineProps({
       <div class="bg-white p-6 rounded shadow space-y-6">
         <div class="grid grid-cols-2 gap-4">
           <div><strong>From:</strong> {{ invoice.from_name }}</div>
-          <div><strong>To:</strong> {{ invoice.to_name }}</div>
+          <div><strong>To:</strong> {{ invoice.client?.name || 'N/A'}}</div>
           <div><strong>Date:</strong> {{ invoice.date }}</div>
           <div><strong>Due Date:</strong> {{ invoice.due_date }}</div>
           <div><strong>Status:</strong> {{ invoice.status }}</div>

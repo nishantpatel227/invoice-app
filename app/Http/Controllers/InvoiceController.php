@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Barryvdh\Snappy\Facades\SnappyPdf;
@@ -12,11 +13,12 @@ use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 
 
 
+
 class InvoiceController extends Controller
 {
     public function index()
     {
-        $invoices = Invoice::with('items')
+        $invoices = Invoice::with('items','client')
             ->where('user_id', auth()->id())
             ->latest()
             ->get();
@@ -28,9 +30,11 @@ class InvoiceController extends Controller
 
     public function create()
     {
+       $clients = Client::orderBy('name')->get(['id', 'name']);
         return Inertia::render('Invoices/Create', [
             'user' => \Illuminate\Support\Facades\Auth::user(),
             'nextInvoiceNumber' => 'INV-' . str_pad(Invoice::max('id') + 1, 5, '0', STR_PAD_LEFT),
+            'clients' => $clients,
         ]);
     }
 
@@ -38,7 +42,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'from_name' => 'nullable|string|max:255',
-            'to_name' => 'nullable|string|max:255',
+            'client_id' => 'required|exists:clients,id',
             'invoice_number' => 'required|string|max:255',
             'date' => 'nullable|date',
             'due_date' => 'nullable|date',
@@ -63,7 +67,7 @@ class InvoiceController extends Controller
         $invoice = Invoice::create([
             'user_id' => auth()->id(),
             'from_name' => $validated['from_name'] ?? '',
-            'to_name' => $validated['to_name'] ?? '',
+            'client_id' => $request->client_id,
             'invoice_number' => (string) $validated['invoice_number'],
             'date' => $validated['date'] ?? null,
             'due_date' => $validated['due_date'] ?? null,
@@ -135,17 +139,27 @@ class InvoiceController extends Controller
         if ($invoice->user_id !== auth()->id()) {
             return redirect()->route('invoices.index')->withErrors('Unauthorized action.');
         }
+        $invoice->load([    
+            'items',
+            'client',
+        ]);
 
         return Inertia::render('Invoices/Show', [
-            'invoice' => $invoice->load('items'),
+            'invoice' => $invoice,
+            'user' => auth()->user(),
+
+            
         ]);
     }
     public function edit(Invoice $invoice)
     {
         $invoice->load('items');
+        $clients = Client::orderBy('name')->get(['id', 'name']);
         return Inertia::render('Invoices/Edit', [
             'invoice' => $invoice,
-            'user' => auth()->user(),
+            'user' => auth()->user(),    
+            'clients' => $clients,
+                
         ]);
     }
     public function update(Request $request, Invoice $invoice)
@@ -156,7 +170,7 @@ class InvoiceController extends Controller
 
     $validated = $request->validate([
         'from_name' => 'nullable|string|max:255',
-        'to_name' => 'nullable|string|max:255',
+         'client_id' => 'required|exists:clients,id',
         'invoice_number' => 'required|string|max:255',
         'date' => 'nullable|date',
         'due_date' => 'nullable|date',
@@ -199,53 +213,7 @@ class InvoiceController extends Controller
         ->route('invoices.index')
         ->with('success', 'Invoice updated successfully.');
     }
-// public function download(Invoice $invoice)
-// {
-//     try {
-//         $invoice->load('items');
 
-//       //  $html = view('invoices.print', compact('invoice'))->render();
-
-//         // Ensure PHP sees the correct binary paths
-//                 return Pdf::view('invoices.print', [
-//                 'invoice' => $invoice
-//             ])
-           
-
-//             // This is required for all PDF generation
-//             ->withBrowsershot(function (Browsershot $browsershot) {
-//                 $browsershot
-//                     ->setNodeBinary(config('pdf.node_binary_path'))
-//                     ->setNpmBinary(config('pdf.npm_binary_path'))
-//                     ->setChromePath(config('pdf.chrome_binary_path'))
-//                     ->setCustomTempPath(storage_path(config('pdf.custom_temp_path')))
-//                     ->waitUntilNetworkIdle();
-//             })
-//             ->name(
-//                 "test.pdf"
-//             )
-//             ->download();
-
-//     } catch (\Exception $e) {
-//         \Log::error('PDF generation failed', ['message' => $e->getMessage()]);
-//         abort(500, 'Could not generate invoice PDF.');
-//     }
-// }
-
-// public function download(Invoice $invoice)
-// {
-//     $invoice->load('items'); // Load related items if not eager-loaded
-
-//     $path = storage_path("app/public/invoice_{$invoice->id}.pdf");
-
-//     Pdf::view('invoices.print', [
-//         'invoice' => $invoice,
-//     ])
-//     ->format('A4')
-//     ->save($path);
-
-//     return response()->download($path);
-// }
 public function download(Invoice $invoice)
 {
     $invoice->load('items');

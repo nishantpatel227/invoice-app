@@ -13,6 +13,7 @@ class Invoice extends Model
         'user_id',
         'from_name',
         'to_name',
+        'client_id',
         'invoice_number',
         'date',
         'due_date',
@@ -38,5 +39,10 @@ class Invoice extends Model
     public function items()
     {
         return $this->hasMany(InvoiceItem::class);
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
     }
 }

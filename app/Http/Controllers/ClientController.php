@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Http\Requests\ClientRequest;
+use App\Http\Requests\UpdateClientRequest;
+use App\Helpers\CountryHelper;
 
 class ClientController extends Controller
 {

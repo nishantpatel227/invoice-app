@@ -118,7 +118,7 @@ const viewInvoice = (invoice) => {
                             </thead>
                             <tbody>
                                 <tr v-for="invoice in invoices" :key="invoice.id" class="border-b hover:bg-gray-50">
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ invoice.to_name }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap">{{ invoice.client?.name || '' }}</td>
                                     <td class="px-4 py-2 whitespace-nowrap">{{ invoice.invoice_number }}</td>
                                     <td class="px-4 py-2 whitespace-nowrap">{{ invoice.date }}</td>
                                     <td class="px-4 py-2 whitespace-nowrap">{{ invoice.due_date }}</td>

@@ -4,6 +4,7 @@ import { ref, watch } from 'vue';
 const props = defineProps({
     form: Object,
     user: Object,
+    clients: Array,
     isEdit: { type: Boolean, default: false },
     onSubmit: Function,
     errors: Object,
@@ -64,7 +65,16 @@ const submit = () => {
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">To</label>
-                <input v-model="form.to_name" type="text" class="w-full rounded border-gray-300" />
+                <select v-model="form.client_id" class="w-full rounded border-gray-300">
+                    <option disabled value="">Select a client</option>
+                    <option
+                        v-for="client in clients"
+                        :key="client.id"
+                        :value="client.id"
+                    >
+                        {{ client.name }}
+                    </option>
+                </select>
             </div>
         </div>
 

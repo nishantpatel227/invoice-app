@@ -6,11 +6,13 @@ import InvoiceForm from './Partials/InvoiceForm.vue';
 const props = defineProps({
   user: Object,
   nextInvoiceNumber: String,
+  clients: Array, // ✅ Added clients prop
 });
 
 const form = useForm({
   from_name: props.user.name ?? '',
-  to_name: '',
+  client: null,
+  client_id: null, // New field for selected client
   invoice_number: props.nextInvoiceNumber,
   date: '',
   due_date: '',
@@ -45,6 +47,7 @@ const submit = () => {
           <InvoiceForm
             :form="form"
             :user="user"
+            :clients="props.clients"
             :isEdit="false"
             :onSubmit="submit"
             :errors="form.errors"

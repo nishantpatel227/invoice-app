@@ -6,6 +6,7 @@ import InvoiceForm from './Partials/InvoiceForm.vue'; // ✅ Must exist
 const props = defineProps({
   invoice: Object,
   user: Object,
+  clients: Array, // ✅ Added clients prop
 });
 
 const form = useForm({
@@ -31,6 +32,7 @@ const submit = () => {
           <InvoiceForm
             :form="form"
             :user="user"
+            :clients="props.clients" 
             :isEdit="true"
             :onSubmit="submit"
             :errors="form.errors"
