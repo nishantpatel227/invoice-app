@@ -5,45 +5,46 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\InvoiceItemController; 
-use Spatie\Browsershot\Browsershot;
+use App\Http\Controllers\ClientController;
 
-// Welcome Page
+// 🔹 Welcome Page
 Route::get('/', function () {
     return Inertia::render('Welcome', [
-        'canLogin'     => Route::has('login'),
-        'canRegister'  => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion'     => PHP_VERSION,
+        'canLogin'      => Route::has('login'),
+        'canRegister'   => Route::has('register'),
+        'laravelVersion'=> Application::VERSION,
+        'phpVersion'    => PHP_VERSION,
     ]);
 });
 
-// Dashboard
-Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->name('dashboard');
+// 🔒 Authenticated Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    
+    // Dashboard
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
 
-// Profile
-Route::middleware('auth')->group(function () {
+    // Profile Management
     Route::get('/profile',    [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-// Invoices
-Route::middleware(['auth'])->group(function () {
-    Route::get('/invoices',           [InvoiceController::class, 'index'])->name('invoices.index');
-    Route::get('/invoices/create',    [InvoiceController::class, 'create'])->name('invoices.create');
-    Route::post('/invoices',          [InvoiceController::class, 'store'])->name('invoices.store');
+    // Invoices
+    Route::resource('invoices', InvoiceController::class)->except(['download']);
     Route::put('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.updateStatus');
-    Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
-    Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
-    Route::get('/invoices/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
-    Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
+    Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
+
+    // Clients
+    Route::resource('clients', ClientController::class);
+    Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
+    Route::get('clients/create', [ClientController::class, 'create'])->name('clients.create');
+    Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
+    Route::get('clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit');
+    Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
+    Route::delete('clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+
+
 });
-Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
-
-
-
 
 require __DIR__.'/auth.php';

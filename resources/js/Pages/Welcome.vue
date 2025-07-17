@@ -1,39 +1,41 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
+
 defineOptions({
-    layout: GuestLayout
-})
-defineProps({
-    canLogin: {
-        type: Boolean,
-    },
-    canRegister: {
-        type: Boolean,
-    },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
-    phpVersion: {
-        type: String,
-        required: true,
-    },
+  layout: GuestLayout,
 });
 
-function handleImageError() {
-    document.getElementById('screenshot-container')?.classList.add('!hidden');
-    document.getElementById('docs-card')?.classList.add('!row-span-1');
-    document.getElementById('docs-card-content')?.classList.add('!flex-row');
-    document.getElementById('background')?.classList.add('!hidden');
-}
+defineProps({
+  canLogin: Boolean,
+  canRegister: Boolean,
+  laravelVersion: String,
+  phpVersion: String,
+});
 </script>
 
+
 <template>
-  <div class="text-center py-10">
-    <h1 class="text-4xl font-bold mb-4">Welcome to Invoice App</h1>
-    <p class="text-gray-600">Create and manage your invoices easily.</p>
-    <Link href="/login" class="mt-4 inline-block text-blue-600 hover:underline">Login</Link>
+  <div class="relative bg-gray-50 min-h-screen flex items-center justify-center px-4 py-16">
+    <div class="max-w-3xl text-center bg-white shadow-lg rounded-2xl p-10">
+      <h1 class="text-5xl font-extrabold text-gray-900 mb-6">
+        Welcome to <span class="text-indigo-600">Invoice App</span>
+      </h1>
+      <p class="text-lg text-gray-600 mb-8">
+        Easily create, track, and download your invoices. <br />
+        Designed for freelancers, small businesses, and teams.
+      </p>
+      <div class="flex justify-center gap-4">
+        <Link
+          href="/login"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-md text-md font-medium transition"
+        >
+          Get Started
+        </Link>
+        
+      </div>
+    </div>
   </div>
 </template>
+
 

@@ -18,11 +18,13 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Nishant Patel',
+            'email' => 'nishant.patel@pderas.com',
+            'password' => bcrypt('password'), // password
         ]);
 
         $this->call(InvoiceSeeder::class);
+        $this->call(ClientSeeder::class);
     }
 
 }
