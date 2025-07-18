@@ -10,16 +10,12 @@ use Inertia\Inertia;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 
-
-
-
-
 class InvoiceController extends Controller
 {
     public function index()
     {
-        $invoices = Invoice::with('items','client')
-            ->where('user_id', auth()->id())
+        $invoices = Invoice::where('user_id', auth()->id())
+            ->with('client')
             ->latest()
             ->get();
 
@@ -97,6 +93,7 @@ class InvoiceController extends Controller
             ->route('invoices.index')
             ->with('success', 'Invoice created successfully.');
     }
+    
 
     public function updateStatus(Request $request, Invoice $invoice)
     {
