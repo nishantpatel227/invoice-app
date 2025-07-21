@@ -6,9 +6,11 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // ✅ Add this
 use Inertia\Inertia;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
+
 
 class InvoiceController extends Controller
 {
@@ -18,6 +20,7 @@ class InvoiceController extends Controller
             ->with('client')
             ->latest()
             ->get();
+            
 
         return Inertia::render('Invoices/Index', [
             'invoices' => $invoices,
@@ -148,17 +151,16 @@ class InvoiceController extends Controller
             
         ]);
     }
-    public function edit(Invoice $invoice)
+        public function edit(Invoice $invoice)
     {
-        $invoice->load('items');
-        $clients = Client::orderBy('name')->get(['id', 'name']);
         return Inertia::render('Invoices/Edit', [
-            'invoice' => $invoice,
-            'user' => auth()->user(),    
-            'clients' => $clients,
-                
+            'invoice' => $invoice, // Load related client
+            'clients' => Client::all(),
+            'user' => Auth::user(),
         ]);
     }
+
+
     public function update(Request $request, Invoice $invoice)
 {
     if ($invoice->user_id !== auth()->id()) {

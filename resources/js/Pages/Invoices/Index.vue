@@ -40,7 +40,7 @@ const {
   sortColumn,
   sortDirection,
   totalPages,
-} = useTable(preFilteredInvoices, { sortColumn: 'date', perPage: 10 }) // Pass preFilteredInvoices here
+} = useTable(preFilteredInvoices, { sortColumn: 'id', perPage: 10 }) // Pass preFilteredInvoices here
 
 // Watch for changes in preFilteredInvoices to reset currentPage to 1
 watch(preFilteredInvoices, () => {
@@ -69,7 +69,12 @@ const toggleActions = (invoice) => {
 }
 
 const viewInvoice = (invoice) => {
-  router.visit(`/invoices/${invoice.id}`)
+  router.visit(`/invoices/${invoice.id}`, {
+    preserveState: true, // Preserve state to avoid reloading the page
+    preserveScroll: true
+   } // Preserve scroll position   
+  )
+
 }
 
 const confirmDelete = (id) => {
@@ -180,21 +185,22 @@ const deleteInvoice = () => {
                       </button>
                     </div>
                     <div
-                      v-if="invoice.showActions"
-                      class="absolute top-full right-0 mt-2 w-30 bg-white border border-gray-200 rounded-xl shadow-2xl z-[9999]"
+                        v-if="invoice.showActions"
+                        class="absolute top-full right-0 mt-2 w-30 bg-white border border-gray-200 rounded-xl shadow-2xl z-[9999]"
                     >
-                      <Link
-                        :href="`/invoices/${invoice.id}/edit`"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        @click="confirmDelete(invoice.id)"
-                        class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                      >
-                        Delete
-                      </button>
+                        <Link
+                            :href="`/invoices/${invoice.id}/edit`"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                            Edit
+                        </Link>
+                        <button
+                            @click="confirmDelete(invoice.id)"
+                            class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        >
+                            Delete
+                        </button>
+                       
                     </div>
                   </td>
                 </tr>
