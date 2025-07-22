@@ -152,13 +152,15 @@ class InvoiceController extends Controller
         ]);
     }
         public function edit(Invoice $invoice)
-    {
-        return Inertia::render('Invoices/Edit', [
-            'invoice' => $invoice, // Load related client
-            'clients' => Client::all(),
-            'user' => Auth::user(),
-        ]);
-    }
+        {
+            $invoice->load('items'); // This adds items into the JSON sent to Vue
+
+            return Inertia::render('Invoices/Edit', [
+                'invoice' => $invoice,
+                'clients' => Client::all(),
+                'user' => Auth::user(),
+            ]);
+        }
 
 
     public function update(Request $request, Invoice $invoice)

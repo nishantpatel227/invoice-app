@@ -42,11 +42,10 @@ const {
   totalPages,
 } = useTable(preFilteredInvoices, { sortColumn: 'id', perPage: 10 }) // Pass preFilteredInvoices here
 
-// Watch for changes in preFilteredInvoices to reset currentPage to 1
-watch(preFilteredInvoices, () => {
-  currentPage.value = 1;
-});
-
+// Watch for search input changes to reset paginatio
+function onSearchOrFilterChange() {
+  currentPage.value = 1
+}
 
 // Actions
 const updateStatus = (invoice) => {

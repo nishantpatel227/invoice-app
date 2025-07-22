@@ -145,8 +145,8 @@ const submit = () => {
 
             <div v-for="(item, index) in props.form.items" :key="index" class="grid grid-cols-7 gap-2 items-center mt-2">
                 <input v-model="item.description" type="text" class="col-span-3 rounded border-gray-300" />
-                <input v-model.number="item.quantity" type="number" min="0"  inputmode="decimal" class="rounded border-gray-300 text-right" />
-                <input v-model.number="item.rate" type="number" min="0"  inputmode="decimal" class="rounded border-gray-300 text-right" />
+                <input v-model.number="item.quantity" type="number" min="0"   class="rounded border-gray-300 text-right" />
+                <input v-model.number="item.rate" type="number" min="0"  class="rounded border-gray-300 text-right" />
                 <div class="text-right">${{ Number(item.amount).toFixed(2) }}</div>
                 <button type="button" @click="removeItem(index)" class="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex justify-center items-center">
                     &times;
