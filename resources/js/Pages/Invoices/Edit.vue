@@ -6,13 +6,14 @@ import InvoiceForm from './Partials/InvoiceForm.vue'; // ✅ Must exist
 const props = defineProps({
   invoice: Object,
   user: Object,
-  clients: Array, // ✅ Added clients prop
+  clients: Array, 
 });
 
 const form = useForm({
   ...props.invoice,
   status: props.invoice.status || 'draft',
   items: props.invoice.items || [],
+  client_id: props.invoice.client_id || null, // Ensure client_id is set
 });
 
 const submit = () => {

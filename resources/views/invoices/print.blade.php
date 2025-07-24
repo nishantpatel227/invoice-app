@@ -4,19 +4,58 @@
     <meta charset="utf-8">
     <title>Invoice #{{ $invoice->invoice_number }}</title>
     <style>
-        body { font-family: sans-serif; color: #333; font-size: 14px; line-height: 1.6; margin: 40px; }
-        h2 { margin-bottom: 5px; }
-        .header { margin-bottom: 30px; }
-        .addresses { display: flex; justify-content: space-between; }
-        .address-block { width: 48%; }
-        .meta { margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f9f9f9; }
-        .totals { margin-top: 20px; width: 100%; border: none; }
-        .totals td { text-align: right; padding: 6px 8px; }
-        .totals tr td:first-child { text-align: left; }
-        .notes, .terms { margin-top: 30px; }
+        body {
+            font-family: sans-serif;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 40px;
+        }
+        h2 {
+            margin-bottom: 5px;
+        }
+        .header, .addresses, .billing-shipping, .notes-terms {
+            margin-bottom: 30px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+        }
+        .col {
+            width: 48%;
+        }
+        .meta p, .address-block p {
+            margin: 0 0 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f9f9f9;
+        }
+        .totals {
+            margin-top: 20px;
+            width: 100%;
+            border: none;
+        }
+        .totals td {
+            text-align: right;
+            padding: 6px 8px;
+        }
+        .totals tr td:first-child {
+            text-align: left;
+        }
+        .notes-terms .col {
+            vertical-align: top;
+        }
     </style>
 </head>
 <body>
@@ -29,24 +68,39 @@
         </div>
     </div>
 
-    <div class="addresses">
-        <div class="address-block">
+    <div class="addresses row">
+        <div class="address-block col">
             <strong>From:</strong><br>
-            {{ $invoice->from_name }}<br>
-            {{-- Add more fields if you store company/address for sender --}}
+            <p>{{ $invoice->from_name }}</p>
+            {{-- Add your own address or company details here --}}
         </div>
-        <div class="address-block">
+        <div class="address-block col">
             <strong>To:</strong><br>
-            {{ $invoice->client->name ?? $invoice->to_name }}<br>
+            <p>{{ $invoice->client->name ?? $invoice->to_name }}</p>
             @if (!empty($invoice->client?->company_name))
-                {{ $invoice->client->company_name }}<br>
+                <p>{{ $invoice->client->company_name }}</p>
             @endif
             @if (!empty($invoice->client?->email))
-                {{ $invoice->client->email }}<br>
+                <p>{{ $invoice->client->email }}</p>
             @endif
-            {{-- You can include client address here if available --}}
+            @if (!empty($invoice->client?->phone_personal))
+                <p>{{ $invoice->client->phone_personal }}</p>
+            @endif
         </div>
     </div>
+
+    @if (!empty($invoice->client?->billing_address) || !empty($invoice->client?->shipping_address))
+        <div class="billing-shipping row">
+            <div class="col">
+                <strong>Billing Address:</strong><br>
+                <p>{{ $invoice->client?->billing_address ?? 'N/A' }}</p>
+            </div>
+            <div class="col">
+                <strong>Shipping Address:</strong><br>
+                <p>{{ $invoice->client?->shipping_address ?? 'N/A' }}</p>
+            </div>
+        </div>
+    @endif
 
     <table>
         <thead>
@@ -92,17 +146,20 @@
         </tr>
     </table>
 
-    @if (!empty($invoice->notes))
-        <div class="notes">
-            <strong>Notes:</strong>
-            <p>{{ $invoice->notes }}</p>
-        </div>
-    @endif
-
-    @if (!empty($invoice->terms))
-        <div class="terms">
-            <strong>Terms:</strong>
-            <p>{{ $invoice->terms }}</p>
+    @if (!empty($invoice->notes) || !empty($invoice->terms))
+        <div class="notes-terms row">
+            @if (!empty($invoice->notes))
+                <div class="col">
+                    <strong>Notes:</strong>
+                    <p>{{ $invoice->notes }}</p>
+                </div>
+            @endif
+            @if (!empty($invoice->terms))
+                <div class="col">
+                    <strong>Terms:</strong>
+                    <p>{{ $invoice->terms }}</p>
+                </div>
+            @endif
         </div>
     @endif
 </body>
