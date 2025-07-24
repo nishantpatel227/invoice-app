@@ -94,7 +94,7 @@ const submit = () => {
     </div>
 
     <!-- Client info -->
-    <div v-if="selectedClient" class="p-6 mt-4 bg-gray-100 rounded-xl shadow-md max-w-3xl">
+    <div v-if="selectedClient" class="p-6 mt-4 bg-gray-100 rounded-xl shadow-md">
       <div class="flex items-center justify-between mb-4">
   <h2 class="text-xl font-semibold">
     {{ selectedClient.company_name || selectedClient.name }}

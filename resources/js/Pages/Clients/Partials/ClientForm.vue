@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import TextInput from '@/Components/TextInput.vue'
 import InputLabel from '@/Components/InputLabel.vue'
 import InputError from '@/Components/InputError.vue'
@@ -13,6 +13,8 @@ const props = defineProps({
 })
 
 const isBusiness = computed(() => props.form.type === 'business')
+
+// Checkbox: Same as billing address
 const sameAsBilling = computed({
   get: () => props.form.same_as_billing || false,
   set: (value) => {
@@ -28,6 +30,8 @@ const sameAsBilling = computed({
     }
   }
 })
+
+// Watch billing fields in case user edits them while sameAsBilling is true
 watch(
   () => [
     props.form.billing_address_line1,
@@ -48,11 +52,10 @@ watch(
     }
   }
 )
-
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit" class="space-y-10 max-w-4xl mx-auto p-6 bg-white shadow-md rounded">
+  <form @submit.prevent="onSubmit" class="space-y-10 max-w-4xl mx-auto p-6 bg-white">
     <!-- Type & Name -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
@@ -159,7 +162,12 @@ watch(
         <TextInput v-model="form.billing_country" placeholder="Country" class="w-full" />
       </div>
     </div>
-
+<div class="mb-4">
+    <label class="inline-flex items-center space-x-2">
+      <input type="checkbox" v-model="sameAsBilling" class="rounded border-gray-300 text-blue-600" />
+      <span class="text-sm text-gray-700">Same as billing address</span>
+    </label>
+  </div>
     <!-- Shipping Address -->
     <div>
       <h3 class="text-xl font-semibold text-gray-800 mb-2">Shipping Address</h3>
@@ -172,7 +180,7 @@ watch(
         <TextInput v-model="form.shipping_country" placeholder="Country" class="w-full" />
       </div>
     </div>
-
+   
     <!-- Notes -->
     <div>
       <InputLabel for="notes" value="Notes" />

@@ -1,18 +1,18 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { Head } from '@inertiajs/vue3'
 
 const props = defineProps({
   invoice: Object,
   user: Object,
-
-});
+})
 </script>
 
 <template>
-  <Head title="View Invoice" />
+  <Head :title="`Invoice #${invoice.invoice_number}`" />
+
   <AuthenticatedLayout>
-   <template #header>
+    <template #header>
       <div class="flex justify-between items-center">
         <h2 class="text-xl font-semibold text-gray-800">
           Invoice #{{ invoice.invoice_number }}
@@ -30,52 +30,74 @@ const props = defineProps({
 
     <div class="py-10 max-w-6xl mx-auto sm:px-6 lg:px-8">
       <div class="bg-white p-6 rounded shadow space-y-6">
-        <div class="grid grid-cols-2 gap-4">
-          <div><strong>From:</strong> {{ invoice.from_name }}</div>
-          <div><strong>To:</strong> {{ invoice.client?.name || 'N/A'}}</div>
+
+        <!-- From & To Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">From</h3>
+            <p>{{ invoice.from_name }}</p>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-700 mb-1">To</h3>
+            <p>{{ invoice.client?.name || 'N/A' }}</p>
+            <p class="text-sm text-gray-600">{{ invoice.client?.email }}</p>
+            <p class="text-sm text-gray-600">{{ invoice.client?.phone_personal }}</p>
+          </div>
+        </div>
+
+        <!-- Date and Status -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
           <div><strong>Date:</strong> {{ invoice.date }}</div>
           <div><strong>Due Date:</strong> {{ invoice.due_date }}</div>
           <div><strong>Status:</strong> {{ invoice.status }}</div>
         </div>
 
+        <!-- Items Table -->
         <div>
-          <h3 class="text-lg font-medium mb-2">Items</h3>
-          <table class="w-full border-collapse">
-            <thead class="bg-gray-100">
-              <tr>
-                <th class="border p-2 text-left">Description</th>
-                <th class="border p-2">Qty</th>
-                <th class="border p-2">Rate</th>
-                <th class="border p-2">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in invoice.items" :key="index">
-                <td class="border p-2">{{ item.description }}</td>
-                <td class="border p-2 text-center">{{ item.quantity }}</td>
-                <td class="border p-2 text-right">{{ item.rate }}</td>
-                <td class="border p-2 text-right">{{ item.amount }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <h3 class="text-lg font-semibold mb-3">Line Items</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full border text-sm">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="border px-3 py-2 text-left">Description</th>
+                  <th class="border px-3 py-2 text-center">Qty</th>
+                  <th class="border px-3 py-2 text-right">Rate</th>
+                  <th class="border px-3 py-2 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in invoice.items" :key="index">
+                  <td class="border px-3 py-2">{{ item.description }}</td>
+                  <td class="border px-3 py-2 text-center">{{ item.quantity }}</td>
+                  <td class="border px-3 py-2 text-right">{{ item.rate }}</td>
+                  <td class="border px-3 py-2 text-right">{{ item.amount }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="text-right space-y-1">
-          <div>Subtotal: {{ invoice.subtotal }}</div>
-          <div>Tax (%): {{ invoice.tax_percent }}</div>
-          <div>Discount (%): {{ invoice.discount }}</div>
-          <div>Shipping: {{ invoice.shipping }}</div>
-          <div class="text-xl font-bold">Total: {{ invoice.total }}</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Notes & Terms -->
+        <div v-if="invoice.notes || invoice.terms" class="space-y-4">
+          <div v-if="invoice.notes">
+            <h4 class="font-medium text-gray-700">Notes</h4>
+            <p class="text-sm text-gray-600 whitespace-pre-line">{{ invoice.notes }}</p>
+          </div>
+          <div v-if="invoice.terms">
+            <h4 class="font-medium text-gray-700">Terms</h4>
+            <p class="text-sm text-gray-600 whitespace-pre-line">{{ invoice.terms }}</p>
+          </div>
         </div>
-
-        <div>
-          <h4 class="font-medium">Notes</h4>
-          <p class="text-sm text-gray-600">{{ invoice.notes }}</p>
+        <!-- Summary Section -->
+        <div class="text-right space-y-1 text-sm text-gray-800">
+          <div><strong>Subtotal:</strong> {{ invoice.subtotal }}</div>
+          <div><strong>Tax (%):</strong> {{ invoice.tax_percent }}</div>
+          <div><strong>Discount (%):</strong> {{ invoice.discount }}</div>
+          <div><strong>Shipping:</strong> {{ invoice.shipping }}</div>
+          <div class="text-lg font-bold">Total: {{ invoice.total }}</div>
         </div>
-        <div>
-          <h4 class="font-medium">Terms</h4>
-          <p class="text-sm text-gray-600">{{ invoice.terms }}</p>
-        </div>
+      </div>
       </div>
     </div>
   </AuthenticatedLayout>
