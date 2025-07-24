@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import TextInput from '@/Components/TextInput.vue'
 import InputLabel from '@/Components/InputLabel.vue'
 import InputError from '@/Components/InputError.vue'
@@ -13,18 +13,58 @@ const props = defineProps({
 })
 
 const isBusiness = computed(() => props.form.type === 'business')
+
+// Checkbox: Same as billing address
+const sameAsBilling = computed({
+  get: () => props.form.same_as_billing || false,
+  set: (value) => {
+    props.form.same_as_billing = value
+
+    if (value) {
+      props.form.shipping_address_line1 = props.form.billing_address_line1
+      props.form.shipping_address_line2 = props.form.billing_address_line2
+      props.form.shipping_city = props.form.billing_city
+      props.form.shipping_state = props.form.billing_state
+      props.form.shipping_postal_code = props.form.billing_postal_code
+      props.form.shipping_country = props.form.billing_country
+    }
+  }
+})
+
+// Watch billing fields in case user edits them while sameAsBilling is true
+watch(
+  () => [
+    props.form.billing_address_line1,
+    props.form.billing_address_line2,
+    props.form.billing_city,
+    props.form.billing_state,
+    props.form.billing_postal_code,
+    props.form.billing_country
+  ],
+  () => {
+    if (sameAsBilling.value) {
+      props.form.shipping_address_line1 = props.form.billing_address_line1
+      props.form.shipping_address_line2 = props.form.billing_address_line2
+      props.form.shipping_city = props.form.billing_city
+      props.form.shipping_state = props.form.billing_state
+      props.form.shipping_postal_code = props.form.billing_postal_code
+      props.form.shipping_country = props.form.billing_country
+    }
+  }
+)
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit" class="space-y-8 max-w-4xl mx-auto p-4">
+  <form @submit.prevent="onSubmit" class="space-y-10 max-w-4xl mx-auto p-6 bg-white">
+    <!-- Type & Name -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Client Type -->
       <div>
-        <InputLabel for="type" value="Client Type" />
+        <InputLabel for="type" value="Client Type *" />
         <select
           v-model="form.type"
           id="type"
-          class="mt-1 block w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+          class="mt-1 block w-full rounded border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="individual">Individual</option>
           <option value="business">Business</option>
@@ -32,163 +72,149 @@ const isBusiness = computed(() => props.form.type === 'business')
         <InputError :message="errors.type" class="mt-1" />
       </div>
 
-      <!-- Name -->
       <div>
-        <InputLabel for="name" value="Name" />
+        <InputLabel for="name" value="Name *" />
         <TextInput id="name" v-model="form.name" type="text" class="mt-1 block w-full" required />
         <InputError :message="errors.name" class="mt-1" />
       </div>
+    </div>
 
-      <!-- Company Name (for business only) -->
-      <div v-if="isBusiness" class="md:col-span-2">
-        <InputLabel for="company_name" value="Company Name" />
-        <TextInput id="company_name" v-model="form.company_name" type="text" class="mt-1 block w-full" />
-        <InputError :message="errors.company_name" class="mt-1" />
-      </div>
+    <!-- Company Name -->
+    <div v-if="isBusiness">
+      <InputLabel for="company_name" value="Company Name *" />
+      <TextInput
+        id="company_name"
+        v-model="form.company_name"
+        type="text"
+        class="mt-1 block w-full"
+        required
+      />
+      <InputError :message="errors.company_name" class="mt-1" />
+    </div>
 
-      <!-- Contact Person -->
+    <!-- Contact Info -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <InputLabel for="contact_person" value="Contact Person" />
         <TextInput id="contact_person" v-model="form.contact_person" type="text" class="mt-1 block w-full" />
         <InputError :message="errors.contact_person" class="mt-1" />
       </div>
 
-      <!-- Email -->
       <div>
-        <InputLabel for="email" value="Email" />
-        <TextInput id="email" v-model="form.email" type="email" class="mt-1 block w-full" />
+        <InputLabel for="email" value="Email *" />
+        <TextInput
+          id="email"
+          v-model="form.email"
+          type="email"
+          required
+          class="mt-1 block w-full"
+        />
         <InputError :message="errors.email" class="mt-1" />
       </div>
 
-      <!-- Phone Personal -->
       <div>
         <InputLabel for="phone_personal" value="Phone (Personal)" />
-        <TextInput id="phone_personal" v-model="form.phone_personal" type="text" class="mt-1 block w-full" />
+        <TextInput id="phone_personal" v-model="form.phone_personal" type="tel" class="mt-1 block w-full" />
         <InputError :message="errors.phone_personal" class="mt-1" />
       </div>
 
-      <!-- Phone Business -->
       <div>
         <InputLabel for="phone_business" value="Phone (Business)" />
-        <TextInput id="phone_business" v-model="form.phone_business" type="text" class="mt-1 block w-full" />
+        <TextInput id="phone_business" v-model="form.phone_business" type="tel" class="mt-1 block w-full" />
         <InputError :message="errors.phone_business" class="mt-1" />
       </div>
 
-      <!-- Extension -->
       <div>
         <InputLabel for="phone_extension" value="Extension" />
         <TextInput id="phone_extension" v-model="form.phone_extension" type="text" class="mt-1 block w-full" />
         <InputError :message="errors.phone_extension" class="mt-1" />
       </div>
 
-      <!-- Tax Number -->
       <div>
         <InputLabel for="tax_number" value="Tax Number" />
         <TextInput id="tax_number" v-model="form.tax_number" type="text" class="mt-1 block w-full" />
         <InputError :message="errors.tax_number" class="mt-1" />
       </div>
 
-      <!-- Currency -->
       <div>
-        <InputLabel for="currency" value="Currency" />
-        <TextInput id="currency" v-model="form.currency" type="text" class="mt-1 block w-full" />
+        <InputLabel for="currency" value="Currency (e.g. USD, CAD)" />
+        <TextInput
+          id="currency"
+          v-model="form.currency"
+          type="text"
+          minlength="3"
+          maxlength="3"
+          class="mt-1 block w-full uppercase"
+        />
         <InputError :message="errors.currency" class="mt-1" />
       </div>
     </div>
 
     <!-- Billing Address -->
-    <h3 class="text-xl font-semibold text-gray-800 mt-10 mb-4 border-b pb-2">Billing Address</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <TextInput v-model="form.billing_address_line1" placeholder="Address Line 1" class="w-full" />
-      <TextInput v-model="form.billing_address_line2" placeholder="Address Line 2" class="w-full" />
-      <TextInput v-model="form.billing_city" placeholder="City" class="w-full" />
-      <TextInput v-model="form.billing_state" placeholder="State/Province" class="w-full" />
-      <TextInput v-model="form.billing_postal_code" placeholder="Postal Code" class="w-full" />
-      <TextInput v-model="form.billing_country" placeholder="Country" class="w-full" />
+    <div>
+      <h3 class="text-xl font-semibold text-gray-800 mb-2">Billing Address</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <TextInput v-model="form.billing_address_line1" placeholder="Address Line 1" class="w-full" />
+        <TextInput v-model="form.billing_address_line2" placeholder="Address Line 2" class="w-full" />
+        <TextInput v-model="form.billing_city" placeholder="City" class="w-full" />
+        <TextInput v-model="form.billing_state" placeholder="State/Province" class="w-full" />
+        <TextInput v-model="form.billing_postal_code" placeholder="Postal Code" class="w-full" />
+        <TextInput v-model="form.billing_country" placeholder="Country" class="w-full" />
+      </div>
     </div>
-
+<div class="mb-4">
+    <label class="inline-flex items-center space-x-2">
+      <input type="checkbox" v-model="sameAsBilling" class="rounded border-gray-300 text-blue-600" />
+      <span class="text-sm text-gray-700">Same as billing address</span>
+    </label>
+  </div>
     <!-- Shipping Address -->
-    <h3 class="text-xl font-semibold text-gray-800 mt-10 mb-4 border-b pb-2">
-  Shipping Address
-</h3>
-
-<!-- Address Line 1 & 2 -->
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-  <TextInput
-    v-model="form.shipping_address_line1"
-    placeholder="Address Line 1"
-    class="w-full"
-  />
-  <TextInput
-    v-model="form.shipping_address_line2"
-    placeholder="Address Line 2"
-    class="w-full"
-  />
-</div>
-
-<!-- City & State -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-  <TextInput
-    v-model="form.shipping_city"
-    placeholder="City"
-    class="w-full"
-  />
-  <TextInput
-    v-model="form.shipping_state"
-    placeholder="State / Province"
-    class="w-full"
-  />
-</div>
-
-<!-- Postal Code & Country -->
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-  <TextInput
-    v-model="form.shipping_postal_code"
-    placeholder="Postal Code"
-    class="w-full"
-  />
-  <TextInput
-    v-model="form.shipping_country"
-    placeholder="Country"
-    class="w-full"
-  />
-</div>
-
-
+    <div>
+      <h3 class="text-xl font-semibold text-gray-800 mb-2">Shipping Address</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <TextInput v-model="form.shipping_address_line1" placeholder="Address Line 1" class="w-full" />
+        <TextInput v-model="form.shipping_address_line2" placeholder="Address Line 2" class="w-full" />
+        <TextInput v-model="form.shipping_city" placeholder="City" class="w-full" />
+        <TextInput v-model="form.shipping_state" placeholder="State / Province" class="w-full" />
+        <TextInput v-model="form.shipping_postal_code" placeholder="Postal Code" class="w-full" />
+        <TextInput v-model="form.shipping_country" placeholder="Country" class="w-full" />
+      </div>
+    </div>
+   
     <!-- Notes -->
-    <div class="mt-10">
+    <div>
       <InputLabel for="notes" value="Notes" />
       <textarea
         id="notes"
         v-model="form.notes"
-        rows="4"
+        rows="3"
         class="mt-1 block w-full rounded border border-gray-300 px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
       ></textarea>
       <InputError :message="errors.notes" class="mt-1" />
     </div>
 
     <!-- Preferences -->
-    <div class="mt-6 flex flex-wrap gap-6">
-      <label class="flex items-center space-x-2">
+    <div class="flex flex-wrap gap-6 mt-6">
+      <label class="flex items-center gap-2">
         <input
           type="checkbox"
           v-model="form.receive_email"
           class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200"
         />
-        <span class="text-sm text-gray-700">Receive emails</span>
+        <span class="text-gray-700 text-sm">Receive emails</span>
       </label>
-      <label class="flex items-center space-x-2">
+      <label class="flex items-center gap-2">
         <input
           type="checkbox"
           v-model="form.is_active"
           class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200"
         />
-        <span class="text-sm text-gray-700">Active</span>
+        <span class="text-gray-700 text-sm">Active</span>
       </label>
     </div>
 
-    <!-- Submit Button -->
-    <div class="pt-10 text-right">
+    <!-- Submit -->
+    <div class="text-right pt-8">
       <PrimaryButton type="submit" class="px-6 py-2 text-base">
         {{ isEdit ? 'Update' : 'Create' }} Client
       </PrimaryButton>

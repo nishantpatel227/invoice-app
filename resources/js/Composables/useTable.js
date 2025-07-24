@@ -6,7 +6,7 @@ export default function useTable(data, options = {}) {
 
   const currentPage = ref(1)
   const sortColumn = ref(initialSortColumn || null)
-  const sortDirection = ref('asc') // 'asc' or 'desc'
+  const sortDirection = ref(options.sortDirection || 'desc')
   const perPage = ref(initialPerPage || 10)
 
   // Computed property to get the actual data to work with (reactive)
