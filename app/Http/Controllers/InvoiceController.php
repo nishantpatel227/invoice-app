@@ -33,7 +33,8 @@ class InvoiceController extends Controller
         return Inertia::render('Invoices/Create', [
             'user' => \Illuminate\Support\Facades\Auth::user(),
             'nextInvoiceNumber' => 'INV-' . str_pad(Invoice::max('id') + 1, 5, '0', STR_PAD_LEFT),
-            'clients' => $clients,
+            
+            'clients' => Client::all(),
         ]);
     }
 
