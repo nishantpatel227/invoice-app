@@ -30,6 +30,20 @@ class Invoice extends Model
         'terms',
         'status',
     ];
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        
+        'subtotal' => 'float',
+        'tax_percent' => 'float',
+        'discount' => 'float',
+        'shipping' => 'float',
+        'total' => 'float', // <-- Add this line
+    ];
+
 
     public function user()
     {

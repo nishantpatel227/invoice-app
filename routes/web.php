@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\DashboardController;
 
 // 🔹 Welcome Page
 Route::get('/', function () {
@@ -21,9 +22,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     
     // Dashboard
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile Management
     Route::get('/profile',    [ProfileController::class, 'edit'])->name('profile.edit');
