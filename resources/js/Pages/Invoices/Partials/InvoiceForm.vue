@@ -75,7 +75,7 @@ const submit = () => {
 </script>
 
 <template>
-  <form @submit.prevent="submit" class="space-y-8 bg-white p-6 rounded shadow">
+  <form @submit.prevent="submit" class="space-y-8 bg-white p-6 rounded ">
     <div class="grid grid-cols-2 gap-6">
       <!-- From / To -->
       <div>

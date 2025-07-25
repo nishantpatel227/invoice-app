@@ -1,8 +1,8 @@
 <script setup>
 import { ref, watch } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, router, Link } from '@inertiajs/vue3'; // Import Link
-
+import { Head, router, Link } from '@inertiajs/vue3';
+import { Bar } from 'vue-chartjs';
 import {
   Chart as ChartJS,
   Title,
@@ -21,15 +21,16 @@ const props = defineProps({
   monthlyChartData: Array,
   monthlyChartLabels: Array,
   recentInvoices: Array,
-  selectedRange: String,
-  initialFromDate: String,
-  initialToDate: String,
+  selectedRange: String, // To pre-select the dropdown
+  // We'll also pass back the 'from' and 'to' dates if they were set by a custom range
+  initialFromDate: String, // YYYY-MM-DD
+  initialToDate: String,   // YYYY-MM-DD
 });
 
 // Date filter state
 const selectedRange = ref(props.selectedRange || 'this_month');
-const fromDate = ref(props.initialFromDate || null);
-const toDate = ref(props.initialToDate || null);
+const fromDate = ref(props.initialFromDate || null); // Initialize with prop or null
+const toDate = ref(props.initialToDate || null);     // Initialize with prop or null
 
 // Chart data (reactive)
 const chartData = ref({
@@ -43,7 +44,7 @@ const chartData = ref({
   ],
 });
 
-// Watch for changes in chart data props and update chartData accordingly.
+// Watch for changes in chart data props and update chartData accordingly
 watch([() => props.monthlyChartData, () => props.monthlyChartLabels], ([newData, newLabels]) => {
   chartData.value.datasets[0].data = newData;
   chartData.value.labels = newLabels;
@@ -64,36 +65,42 @@ function applyFilter() {
   let filterTo = null;
 
   if (selectedRange.value === 'custom_range') {
+    // For custom range, use the values from the date inputs
     filterFrom = fromDate.value;
     filterTo = toDate.value;
   } else {
+    // For predefined ranges, calculate dates
     switch (selectedRange.value) {
       case 'this_month':
         filterFrom = new Date(now.getFullYear(), now.getMonth(), 1);
-        filterTo = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        filterTo = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of current month
         break;
       case 'last_month':
         filterFrom = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        filterTo = new Date(now.getFullYear(), now.getMonth(), 0);
+        filterTo = new Date(now.getFullYear(), now.getMonth(), 0); // Last day of last month
         break;
       case 'last_3_months':
         filterFrom = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-        filterTo = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        filterTo = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of current month
         break;
       case 'this_year':
         filterFrom = new Date(now.getFullYear(), 0, 1);
-        filterTo = new Date(now.getFullYear(), 11, 31);
+        filterTo = new Date(now.getFullYear(), 11, 31); // Last day of current year
         break;
       default:
+        // Default to 'this_month' if somehow an invalid option is selected
         selectedRange.value = 'this_month';
         filterFrom = new Date(now.getFullYear(), now.getMonth(), 1);
         filterTo = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         break;
     }
+
+    // Convert Date objects to YYYY-MM-DD strings
     filterFrom = filterFrom ? filterFrom.toISOString().slice(0, 10) : null;
     filterTo = filterTo ? filterTo.toISOString().slice(0, 10) : null;
   }
 
+  // Perform the Inertia request
   router.get(route('dashboard'), {
     from: filterFrom,
     to: filterTo,
@@ -115,7 +122,8 @@ function applyFilter() {
       </h2>
     </template>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+    <div class="min-h-screen bg-gray-50 py-10">
+        <div class="flex flex-col mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 gap-6">
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
         <div class="flex items-center">
           <label for="date-range-select" class="text-sm font-medium mr-2">Date Range:</label>
@@ -123,7 +131,7 @@ function applyFilter() {
             id="date-range-select"
             v-model="selectedRange"
             @change="applyFilter"
-            class="border rounded p-1.5 focus:ring-blue-500 focus:border-blue-500"
+            class="border rounded focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="this_month">This Month</option>
             <option value="last_month">Last Month</option>
@@ -211,6 +219,7 @@ function applyFilter() {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   </AuthenticatedLayout>
 </template>
