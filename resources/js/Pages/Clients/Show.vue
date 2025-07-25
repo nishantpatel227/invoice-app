@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
   client: Object,
@@ -10,8 +10,17 @@ const props = defineProps({
 <template>
   <Head :title="`Client: ${client.name}`" />
   <AuthenticatedLayout>
+    
     <template #header>
-      <h2 class="text-xl font-semibold text-gray-800">Client Details</h2>
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800">Client Details</h2>
+        <Link
+          :href="`/clients/${client.id}/edit`"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Edit Client
+        </Link>
+      </div>
     </template>
 
     <div class="py-10">
