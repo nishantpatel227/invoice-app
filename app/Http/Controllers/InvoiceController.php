@@ -6,7 +6,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // ✅ Add this
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
@@ -29,12 +29,11 @@ class InvoiceController extends Controller
 
     public function create()
     {
-       $clients = Client::orderBy('name')->get(['id', 'name']);
+       $clients = Client::where('user_id', auth()->id())->get();
         return Inertia::render('Invoices/Create', [
             'user' => \Illuminate\Support\Facades\Auth::user(),
             'nextInvoiceNumber' => 'INV-' . str_pad(Invoice::max('id') + 1, 5, '0', STR_PAD_LEFT),
-            
-            'clients' => Client::all(),
+            'clients' => $clients,
         ]);
     }
 
@@ -156,9 +155,11 @@ class InvoiceController extends Controller
         {
             $invoice->load('items'); // This adds items into the JSON sent to Vue
 
+            $clients = Client::where('user_id', auth()->id())->get();
+
             return Inertia::render('Invoices/Edit', [
                 'invoice' => $invoice,
-                'clients' => Client::all(),
+                'clients' => $clients,
                 'user' => Auth::user(),
             ]);
         }
