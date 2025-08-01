@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+
 import { Head, router, Link, usePage } from '@inertiajs/vue3';
 import { Bar } from 'vue-chartjs';
 import {
@@ -103,7 +104,7 @@ function applyFilter() {
 
   <AuthenticatedLayout>
     <template #header>
-      <h2 class="text-xl font-semibold leading-tight text-gray-800">Invoice App Dashboard</h2>
+      <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
     </template>
 
     <div class="min-h-screen bg-gray-50 py-10">

@@ -1,7 +1,8 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3'
 import { ref, onMounted } from 'vue'
+
 
 const props = defineProps({
   clients: Array,
