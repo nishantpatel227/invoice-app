@@ -1,4 +1,4 @@
-# 📄 Invoice App
+# 📄 InvoFlow App
 
 A multi-user invoice generation application built with **Laravel**, **Vue 3**, **Inertia.js**, and **Vite**. Users can log in, create invoices, update status, export to PDF, and generate reports with filtering options.
 
