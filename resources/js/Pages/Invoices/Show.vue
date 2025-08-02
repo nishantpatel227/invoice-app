@@ -13,7 +13,7 @@ const props = defineProps({
 
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex justify-between items-center">
+      <div class="flex items-center justify-between w-full">
         <h2 class="text-xl font-semibold text-gray-800">
           Invoice #{{ invoice.invoice_number }}
         </h2>

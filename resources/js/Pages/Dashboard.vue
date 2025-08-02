@@ -104,10 +104,11 @@ function applyFilter() {
 
   <AuthenticatedLayout>
     <template #header>
-      <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
+      <div class="flex items-center justify-between w-full min-h-10">
+        <h2 class="text-xl font-semibold text-gray-800">Dashboard</h2>
+        </div>
     </template>
-
-    <div class="min-h-screen bg-gray-50 py-10">
+    <div class="py-10">
       <div class="mx-auto max-w-7xl px-4 space-y-6">
         <!-- Filters -->
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
