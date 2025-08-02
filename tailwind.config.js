@@ -13,7 +13,18 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Work Sans', 'system-ui', 'sans-serif'],
+            },
+            colors: {
+                primary: '#2563EB',
+                secondary: '#64748B',
+                accent: '#38BDF8',
+                background: '#F9FAFB',
+                heading: '#111827',
+                body: '#374151',
+                success: '#22C55E',
+                warning: '#FACC15',
+                error: '#EF4444',
             },
         },
         screens: {

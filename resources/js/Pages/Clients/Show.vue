@@ -12,16 +12,17 @@ const props = defineProps({
   <AuthenticatedLayout>
     
     <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800">Client Details</h2>
-        <Link
-          :href="`/clients/${client.id}/edit`"
-          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Edit Client
-        </Link>
+      <div class="flex items-center justify-between w-full">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">Clients</h2>
+    <Link
+      :href="`/clients/${client.id}/edit`"
+      class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    >
+      Edit Client
+    </Link>
       </div>
-    </template>
+    
+  </template>
 
     <div class="py-10">
       <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">

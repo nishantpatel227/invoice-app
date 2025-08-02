@@ -1,7 +1,8 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3'
 import { ref, onMounted } from 'vue'
+
 
 const props = defineProps({
   clients: Array,
@@ -53,8 +54,8 @@ function deleteClient() {
   <Head title="Clients" />
 
   <AuthenticatedLayout>
-    <template #header>
-      <div class="flex items-center justify-between">
+     <template #header>
+      <div class="flex items-center justify-between w-full">
         <h2 class="text-xl font-semibold leading-tight text-gray-800">Clients</h2>
         <Link
           href="/clients/create"
@@ -64,6 +65,7 @@ function deleteClient() {
         </Link>
       </div>
     </template>
+
 
     <div class="min-h-screen bg-gray-50 py-10">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
